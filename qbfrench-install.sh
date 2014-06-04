@@ -342,7 +342,7 @@ class smartorrent(object):
       parser = self.SimpleSGMLParser(results, self.url)
       dat = ""
       for subcat in self.supported_categories[cat]:
-        dat += opener.open(self.url+"/?page=search&term=%s&cat=%s&voir=%d&ordre=sd"%(what, subcat, i)).read().decode("iso-8859-1", "replace").replace("<b><font color="#474747">", "").replace("</font></b>", "")
+        dat += opener.open(self.url+"/?page=search&term=%s&cat=%s&voir=%d&ordre=sd"%(what, subcat, i)).read().decode("iso-8859-1", "replace").replace("<b><font color=\"#474747\">", "").replace("</font></b>", "")
       parser.feed(dat)
       parser.close()
       if len(results) <= 0:
