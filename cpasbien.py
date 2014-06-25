@@ -47,9 +47,9 @@ class cpasbien(object):
             self.current_item["name"] = data.strip()
           elif self.data_counter == 6:
             self.current_item["size"] = data.strip()
-          elif self.data_counter == 10:
+          elif self.data_counter == 9:
             self.current_item["seeds"] = data.strip()
-          elif self.data_counter == 12:
+          elif self.data_counter == 11:
             self.current_item["leech"] = data.strip()
             self.current_item["engine_url"] = self.url
             self.data_counter = None
