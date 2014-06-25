@@ -8,7 +8,7 @@ from novaprinter import prettyPrinter
 import sgmllib, re, urllib2, os , tempfile, webbrowser
 
 class torrentfrancais(object):
-  url = "http://www.torrentfrancais.com"
+  url = "http://www.torrentfrancais.eu"
   name = "TorrentFrancais (french)"
 
   def __init__(self):
@@ -47,7 +47,7 @@ class torrentfrancais(object):
 
     def start_a(self, attr):
       params = dict(attr)
-      if params.has_key("href") and params.has_key("title") and (params.has_key("class") == False) and params["href"].startswith("http://www.torrentfrancais.com/torrent/"):
+      if params.has_key("href") and params.has_key("title") and (params.has_key("class") == False) and params["href"].startswith("http://www.torrentfrancais.eu/torrent/"):
         self.current_item = {}
         self.td_counter = 0
         self.current_item["desc_link"] = params["href"].strip()
