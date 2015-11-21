@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#VERSION: 1.0
-#AUTHOR: Davy39 <davy39@hmamail.com>
+#VERSION: 1.1
+#AUTHORS: Davy39 <davy39@hmamail.com>, Danfossi <danfossi@itfor.it>
 
 # Copyleft
 
@@ -11,14 +11,14 @@ class t411(object):
 
 ###########  !!!!!  CHANGE ME  !!!!!! #############
                                                 ###
-  # your identifiant on t411.me:                ###
-  username = 'Change_Me'                        ###
+  # your identifiant on t411.io:                ###
+  username = 'Your_User'                        ###
   # and your password:                          ###
-  password = 'Change_Me'                        ###
+  password = 'Your_Pass'                        ###
                                                 ###
 ###################################################
 
-  url = 'http://www.t411.me'
+  url = 'http://www.t411.io'
   name = 'T411 (french - need login)'
   supported_categories = {'anime':'', 'games': '', 'all': '', 'movies': 'cat=210&subcat=631', 'tv': 'cat=210&subcat=433', 'music': 'cat=395&subcat=623', 'software': 'cat=233', 'books': 'cat=404'}
   cookie_values = {'login':username, 'password':password, 'remember':'1', 'url':'/'}
@@ -62,7 +62,7 @@ class t411(object):
       
     def start_a(self, attr):
       params = dict(attr)
-      if params.has_key('href') and params['href'].startswith("//www.t411.me/torrents"):
+      if params.has_key('href') and params['href'].startswith("//www.t411.io/torrents"):
         self.current_item = {}
         self.td_counter = 0
         self.current_item['desc_link'] = 'http:' + params['href'].strip()
