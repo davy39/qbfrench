@@ -40,14 +40,14 @@ class t411(object):
     url = 'http://{}'.format(domain)
     name = 'T411 (french - need login)'
     supported_categories = {
-        'anime': '',
-        'games': '',
-        'all': '',
-        'movies': 'cat=210&subcat=631',
-        'tv': 'cat=210&subcat=433',
-        'music': 'cat=395&subcat=623',
-        'software': 'cat=233',
-        'books': 'cat=404'
+        'all': [''],
+        'anime': ['cat=210&subcat=455', 'cat=210&subcat=637'],
+        'games': ['cat=624', 'cat=340'],
+        'movies': ['cat=210&subcat=631'],
+        'tv': ['cat=210&subcat=433'],
+        'music': ['cat=395&subcat=623'],
+        'software': ['cat=233'],
+        'books': ['cat=404']
     }
     cookie_values = {
         'login': username, 'password': password,
@@ -138,20 +138,16 @@ class t411(object):
                         self.results.append('a')
 
     def search(self, what, cat='all'):
-        i = 0
-        while i < 100:
+        for page in range(100):
             results = []
             parser = self.SimpleHTMLParser(results, self.url)
-            if cat == 'anime':
-                dat = request.urlopen(self.url + '/torrents/search/?cat=210&subcat=455&search=%s&order=seeders&type=desc&page=%d' % (what, i)).read().decode('windows-1252', 'replace')
-                dat += request.urlopen(self.url + '/torrents/search/?cat=210&subcat=637&search=%s&order=seeders&type=desc&page=%d' % (what, i)).read().decode('windows-1252', 'replace')
-            elif cat == 'games':
-                dat = request.urlopen(self.url + '/torrents/search/?cat=624&search=%s&order=seeders&type=desc&page=%d' % (what, i)).read().decode('windows-1252', 'replace')
-                dat += request.urlopen(self.url + '/torrents/search/?cat=340&search=%s&order=seeders&type=desc&page=%d' % (what, i)).read().decode('windows-1252', 'replace')
-            else:
-                dat = request.urlopen(self.url + '/torrents/search/?%s&search=%s&order=seeders&type=desc&page=%d' % (self.supported_categories[cat], what, i)).read().decode('windows-1252', 'replace')
-            parser.feed(dat)
+            data = ''
+            for t411_cat in self.supported_categories[cat]:
+                path = ('/torrents/search/?{}&search={}&order=seeders&type=desc&page={}'
+                        .format(t411_cat, what, page))
+                raw_data = request.urlopen(self.url + path).read()
+                data += raw_data.decode('windows-1252', 'replace')
+            parser.feed(data)
             parser.close()
             if len(results) <= 0:
                 break
-            i += 1
