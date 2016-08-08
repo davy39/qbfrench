@@ -6,11 +6,16 @@
 
 import cookielib
 import os
-import sgmllib
 import tempfile
 import urllib
 import urllib2
 import webbrowser
+try:
+    # python2
+    from HTMLParser import HTMLParser
+except ImportError:
+    # python3
+    from html.parser import HTMLParser
 
 from novaprinter import prettyPrinter
 
@@ -46,7 +51,7 @@ class t411(object):
 
     def __init__(self):
         self.results = []
-        self.parser = self.SimpleSGMLParser(self.results, self.url)
+        self.parser = self.SimpleHTMLParser(self.results, self.url)
 
     def _sign_in(self):
         cj = cookielib.CookieJar()
@@ -73,13 +78,19 @@ class t411(object):
             webbrowser.open(url, new=2, autoraise=True)
             return
 
-    class SimpleSGMLParser(sgmllib.SGMLParser):
+    class SimpleHTMLParser(HTMLParser):
         def __init__(self, results, url, *args):
-            sgmllib.SGMLParser.__init__(self)
+            HTMLParser.__init__(self)
             self.url = url
             self.td_counter = None
             self.current_item = None
             self.results = results
+
+        def handle_starttag(self, tag, attr):
+            if tag == 'a':
+                self.start_a(attr)
+            elif tag == 'td':
+                self.start_td(attr)
 
         def start_a(self, attr):
             params = dict(attr)
@@ -124,7 +135,7 @@ class t411(object):
         i = 0
         while i < 100:
             results = []
-            parser = self.SimpleSGMLParser(results, self.url)
+            parser = self.SimpleHTMLParser(results, self.url)
             if cat == 'anime':
                 dat = urllib2.urlopen(self.url + '/torrents/search/?cat=210&subcat=455&search=%s&order=seeders&type=desc&page=%d' % (what, i)).read().decode('windows-1252', 'replace')
                 dat += urllib2.urlopen(self.url + '/torrents/search/?cat=210&subcat=637&search=%s&order=seeders&type=desc&page=%d' % (what, i)).read().decode('windows-1252', 'replace')
