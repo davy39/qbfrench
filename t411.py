@@ -4,18 +4,23 @@
 
 # Copyleft
 
-import cookielib
+from __future__ import print_function
+
 import os
 import tempfile
-import urllib
-import urllib2
 import webbrowser
 try:
     # python2
+    import urllib2 as request
+    from cookielib import CookieJar
     from HTMLParser import HTMLParser
+    from urllib import urlencode
 except ImportError:
     # python3
+    from urllib import request
+    from http.cookiejar import CookieJar
     from html.parser import HTMLParser
+    from urllib.parse import urlencode
 
 from novaprinter import prettyPrinter
 
@@ -54,9 +59,10 @@ class t411(object):
         self.parser = self.SimpleHTMLParser(self.results, self.url)
 
     def _sign_in(self):
-        cj = cookielib.CookieJar()
-        self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-        url_cookie = self.opener.open(self.url + '/users/login/', urllib.urlencode(self.cookie_values))
+        cj = CookieJar()
+        self.opener = request.build_opener(request.HTTPCookieProcessor(cj))
+        post_params = urlencode(self.cookie_values).encode('utf8')
+        url_cookie = self.opener.open(self.url + '/users/login/', post_params)
 
     def download_torrent(self, url):
         self._sign_in()
@@ -64,7 +70,7 @@ class t411(object):
         # Open browser if login fail
         try:
             response = opener.open(url)
-        except urllib2.URLError as e:
+        except request.URLError as e:
             webbrowser.open(url, new=2, autoraise=True)
             return
         if response.geturl() == url:
@@ -73,7 +79,7 @@ class t411(object):
             file = os.fdopen(file, "wb")
             file.write(dat)
             file.close()
-            print path + " " + url
+            print(path, url)
         else:
             webbrowser.open(url, new=2, autoraise=True)
             return
@@ -137,13 +143,13 @@ class t411(object):
             results = []
             parser = self.SimpleHTMLParser(results, self.url)
             if cat == 'anime':
-                dat = urllib2.urlopen(self.url + '/torrents/search/?cat=210&subcat=455&search=%s&order=seeders&type=desc&page=%d' % (what, i)).read().decode('windows-1252', 'replace')
-                dat += urllib2.urlopen(self.url + '/torrents/search/?cat=210&subcat=637&search=%s&order=seeders&type=desc&page=%d' % (what, i)).read().decode('windows-1252', 'replace')
+                dat = request.urlopen(self.url + '/torrents/search/?cat=210&subcat=455&search=%s&order=seeders&type=desc&page=%d' % (what, i)).read().decode('windows-1252', 'replace')
+                dat += request.urlopen(self.url + '/torrents/search/?cat=210&subcat=637&search=%s&order=seeders&type=desc&page=%d' % (what, i)).read().decode('windows-1252', 'replace')
             elif cat == 'games':
-                dat = urllib2.urlopen(self.url + '/torrents/search/?cat=624&search=%s&order=seeders&type=desc&page=%d' % (what, i)).read().decode('windows-1252', 'replace')
-                dat += urllib2.urlopen(self.url + '/torrents/search/?cat=340&search=%s&order=seeders&type=desc&page=%d' % (what, i)).read().decode('windows-1252', 'replace')
+                dat = request.urlopen(self.url + '/torrents/search/?cat=624&search=%s&order=seeders&type=desc&page=%d' % (what, i)).read().decode('windows-1252', 'replace')
+                dat += request.urlopen(self.url + '/torrents/search/?cat=340&search=%s&order=seeders&type=desc&page=%d' % (what, i)).read().decode('windows-1252', 'replace')
             else:
-                dat = urllib2.urlopen(self.url + '/torrents/search/?%s&search=%s&order=seeders&type=desc&page=%d' % (self.supported_categories[cat], what, i)).read().decode('windows-1252', 'replace')
+                dat = request.urlopen(self.url + '/torrents/search/?%s&search=%s&order=seeders&type=desc&page=%d' % (self.supported_categories[cat], what, i)).read().decode('windows-1252', 'replace')
             parser.feed(dat)
             parser.close()
             if len(results) <= 0:
