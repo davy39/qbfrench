@@ -22,6 +22,7 @@ except ImportError:
     from html.parser import HTMLParser
     from urllib.parse import urlencode
 
+from helpers import retrieve_url
 from novaprinter import prettyPrinter
 
 
@@ -145,8 +146,7 @@ class t411(object):
             for t411_cat in self.supported_categories[cat]:
                 path = ('/torrents/search/?{}&search={}&order=seeders&type=desc&page={}'
                         .format(t411_cat, what, page))
-                raw_data = request.urlopen(self.url + path).read()
-                data += raw_data.decode('windows-1252', 'replace')
+                data += retrieve_url(self.url + path)
             parser.feed(data)
             parser.close()
             if len(results) <= 0:
