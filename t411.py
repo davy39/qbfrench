@@ -11,14 +11,15 @@ class t411(object):
 
 ###########  !!!!!  CHANGE ME  !!!!!! #############
                                                 ###
-  # your identifiant on t411.io:                ###
+  # your identifiant on t411.ch:                ###
   username = 'Your_User'                        ###
   # and your password:                          ###
   password = 'Your_Pass'                        ###
                                                 ###
 ###################################################
 
-  url = 'http://www.t411.io'
+  domain = 'www.t411.ch'
+  url = 'http://{}'.format(domain)
   name = 'T411 (french - need login)'
   supported_categories = {'anime':'', 'games': '', 'all': '', 'movies': 'cat=210&subcat=631', 'tv': 'cat=210&subcat=433', 'music': 'cat=395&subcat=623', 'software': 'cat=233', 'books': 'cat=404'}
   cookie_values = {'login':username, 'password':password, 'remember':'1', 'url':'/'}
@@ -59,17 +60,17 @@ class t411(object):
       self.td_counter = None
       self.current_item = None
       self.results = results
-      
+
     def start_a(self, attr):
       params = dict(attr)
-      if params.has_key('href') and params['href'].startswith("//www.t411.io/torrents"):
+      if params.has_key('href') and params['href'].startswith("//{}/torrents".format(t411.domain)):
         self.current_item = {}
         self.td_counter = 0
         self.current_item['desc_link'] = 'http:' + params['href'].strip()
         self.current_item['name'] = params['title'].strip()
       if params.has_key('href') and params['href'].startswith("/torrents/nfo/"):
         self.current_item['link'] = self.url + params['href'].strip().replace('/torrents/nfo/', '/torrents/download/')
-    
+
     def handle_data(self, data):
       if self.td_counter == 4:
         if not self.current_item.has_key('size'):
