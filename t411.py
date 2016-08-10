@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #VERSION: 1.2
-#AUTHORS: Davy39 <davy39@hmamail.com>, Danfossi <danfossi@itfor.it>, Simon <simon@brulhart.me>
+#AUTHORS: Davy39 <davy39@hmamail.com>, Danfossi <danfossi@itfor.it>
+#CONTRIBUTORS: Simon <simon@brulhart.me>
 
 # Copyleft
 
