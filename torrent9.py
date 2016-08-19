@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#VERSION: 1.1
+#VERSION: 1.2
 #AUTHOR: Davy39 <davy39@hmamail.com>
 #CONTRIBUTORS: Simon <simon@brulhart.me>
 
@@ -65,14 +65,7 @@ class torrent9(object):
                     + desc_path.replace('/torrent/', '/get_torrent/')
                     + '.torrent'
                 )
-                m = re.match(
-                    u'(?:Télécharger )(.*)(?: en Torrent)', params['title'],
-                    flags=re.IGNORECASE
-                )
-                if m:
-                    self.current_item['name'] = m.group(1)
-                else:
-                    self.current_item['name'] = params['title']  # Fallback
+                self.current_item['name'] = ''
 
         def start_span(self, data):
             if self.current_item and self.td_counter == 2:
@@ -84,7 +77,9 @@ class torrent9(object):
 
         def handle_data(self, data):
             if self.current_item and isinstance(self.td_counter, int):
-                if self.td_counter == 1 and 'size' not in self.current_item:
+                if self.td_counter == 0 and data:
+                    self.current_item['name'] += data
+                elif self.td_counter == 1 and 'size' not in self.current_item:
                     self.current_item['size'] = unit_fr2en(data.strip())
                 elif self.collect_seeds:
                     self.collect_seeds = False
@@ -94,6 +89,7 @@ class torrent9(object):
 
         def handle_endtag(self, tag):
             if self.current_item and tag == 'tr':
+                self.current_item['name'] = self.current_item.get('name', '').strip()
                 prettyPrinter(self.current_item)
                 self.results.append('a')
                 self.current_item = None
