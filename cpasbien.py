@@ -44,55 +44,77 @@ class cpasbien(object):
         def __init__(self, results, url, *args):
             HTMLParser.__init__(self)
             self.url = url
-            self.data_counter = None
+            self.div_counter = None
             self.current_item = None
             self.results = results
 
         def handle_starttag(self, tag, attr):
             method = 'start_' + tag
-            if hasattr(self, method) and tag in ('a', 'span', 'td'):
+            if hasattr(self, method) and tag in ('a', 'div'):
                 getattr(self, method)(attr)
 
         def start_a(self, attr):
             params = dict(attr)
-            if params.get('href', '').startswith(self.url + '/dl-torrent'):
+            if params.get('href', '').startswith(self.url + '/dl-torrent/'):
                 self.current_item = {}
-                self.data_counter = 0
-                self.current_item["desc_link"] = params["href"].strip()
-                # TODO plus joli
-                self.current_item["link"] = self.url + '/dl_torrent.php?permalien=' + str(params["href"].strip().split("/")[6].split(".")[0])
+                self.div_counter = 0
+                self.current_item["desc_link"] = params["href"]
+                fname = params["href"].split('/')[-1]
+                fname = re.sub(r'\.html$', '.torrent', fname, flags=re.IGNORECASE)
+                self.current_item["link"] = self.url + '/telechargement/' + fname
+
+        def start_div(self, attr):
+            if self.div_counter is not None:
+                self.div_counter += 1
+                # Abort if div class does not match
+                div_classes = {1: 'poid', 2: 'up', 3: 'down'}
+                attr = dict(attr)
+                if div_classes[self.div_counter] not in attr.get('class', ''):
+                    self.div_counter = None
+                    self.current_item = None
 
         def handle_data(self, data):
-            if isinstance(self.data_counter, int):
-                self.data_counter += 1
-                if self.data_counter == 3:
-                    self.current_item["name"] = data.strip()
-                elif self.data_counter == 6:
-                    self.current_item["size"] = data.strip()
-                elif self.data_counter == 9:
-                    self.current_item["seeds"] = data.strip()
-                elif self.data_counter == 11:
-                    self.current_item["leech"] = data.strip()
-                    self.current_item["engine_url"] = self.url
-                    self.data_counter = None
+            data = data.strip()
+            if data:
+                if self.div_counter == 0:
+                    self.current_item['name'] = data
+                elif self.div_counter == 1:
+                    self.current_item['size'] = unit_fr2en(data)
+                elif self.div_counter == 2:
+                    self.current_item['seeds'] = data
+                elif self.div_counter == 3:
+                    self.current_item['leech'] = data
+            # End of current_item, final validation:
+            if self.div_counter == 3:
+                required_keys = ('name', 'size')
+                if any(key in self.current_item for key in required_keys):
+                    self.current_item['engine_url'] = self.url
                     prettyPrinter(self.current_item)
                     self.results.append("a")
+                else:
+                    pass
+                self.current_item = None
+                self.div_counter = None
 
     def search(self, what, cat="all"):
         for page in range(35):
             results = []
             parser = self.SimpleHTMLParser(results, self.url)
-            data = ''
             for subcat in self.supported_categories[cat]:
-                data += retrieve_url(
+                data = retrieve_url(
                     '{}/recherche/{}{}/page-{},trie-seeds-d'
                     .format(self.url, subcat, what, page)
-                ).replace(' & ', ' et ')
-            results_re = re.compile('(?s)<tbody>.*')
-            for match in results_re.finditer(data):
-                res_tab = match.group(0)
-                parser.feed(res_tab)
-                parser.close()
-                break
+                )
+                parser.feed(data)
+            parser.close()
             if len(results) <= 0:
                 break
+
+
+def unit_fr2en(size):
+    """Convert french size unit to english"""
+    return re.sub(
+        r'([KMGTP])o',
+        lambda match: match.group(1) + 'B',
+        size, flags=re.IGNORECASE
+    )
