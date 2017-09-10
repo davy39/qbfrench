@@ -31,14 +31,14 @@ class t411(object):
 
 ###########  !!!!!  CHANGE ME  !!!!!! #############
                                                 ###
-    # your identifiant on t411.ch:              ###
+    # your identifiant on t411.ai:              ###
     username = 'Your_User'                      ###
     # and your password:                        ###
     password = 'Your_Pass'                      ###
                                                 ###
 ###################################################
 
-    domain = 'www.t411.ch'
+    domain = 'www.t411.ai'
     url = 'http://{}'.format(domain)
     name = 'T411 (french - need login)'
     supported_categories = {

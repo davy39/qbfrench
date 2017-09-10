@@ -116,7 +116,7 @@ Entrez votre mot de passe :" 14 60 2> $fichtemp
 	if [ $? = 0 ]
 	then 
 		password=`cat $fichtemp`
-		wget  --quiet --post-data="login=$login&password=$password&remember=1"  --save-cookies=cookies.txt --keep-session-cookies "http://www.t411.me/users/login/" -O log
+		wget  --quiet --post-data="login=$login&password=$password&remember=1"  --save-cookies=cookies.txt --keep-session-cookies "http://www.t411.ai/users/login/" -O log
 		test=`cat cookies.txt | grep "pass"`		
 		if [ "$test" = '' ]
 		then
@@ -543,7 +543,7 @@ class t411(object):                             ###
 ###################################################
 ###################################################
 
-  url = "http://www.t411.me"
+  url = "http://www.t411.ai"
   name = "T411 (french - need login)"
   supported_categories = {"anime":"", "games": "", "all": "", "movies": "cat=210&subcat=631", "tv": "cat=210&subcat=433", "music": "cat=395&subcat=623", "software": "cat=233", "books": "cat=404"}
   cookie_values = {"login":username, "password":password, "remember":"1", "url":"/"}
@@ -587,7 +587,7 @@ class t411(object):                             ###
       
     def start_a(self, attr):
       params = dict(attr)
-      if params.has_key("href") and params["href"].startswith("//www.t411.me/torrents"):
+      if params.has_key("href") and params["href"].startswith("//www.t411.ai/torrents"):
         self.current_item = {}
         self.td_counter = 0
         self.current_item["desc_link"] = "http:" + params["href"].strip()
